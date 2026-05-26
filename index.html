@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Interactive Demo Site</title>
+
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: Arial, sans-serif;
+    }
+
+    body {
+      background: linear-gradient(135deg, #1e293b, #0f172a);
+      color: white;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    header {
+      text-align: center;
+      padding: 60px 20px;
+    }
+
+    h1 {
+      font-size: 3rem;
+      margin-bottom: 10px;
+    }
+
+    p {
+      opacity: 0.85;
+    }
+
+    .container {
+      width: 90%;
+      max-width: 1100px;
+      margin: auto;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 20px;
+      padding-bottom: 50px;
+    }
+
+    .card {
+      background: rgba(255,255,255,0.08);
+      border-radius: 18px;
+      padding: 25px;
+      backdrop-filter: blur(8px);
+      transition: transform 0.25s ease, background 0.25s ease;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+    }
+
+    .card:hover {
+      transform: translateY(-5px);
+      background: rgba(255,255,255,0.12);
+    }
+
+    button {
+      margin-top: 15px;
+      padding: 12px 18px;
+      border: none;
+      border-radius: 10px;
+      background: #38bdf8;
+      color: white;
+      font-weight: bold;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+
+    button:hover {
+      background: #0ea5e9;
+      transform: scale(1.05);
+    }
+
+    #counter {
+      font-size: 2rem;
+      margin-top: 15px;
+    }
+
+    .color-box {
+      width: 100%;
+      height: 120px;
+      border-radius: 12px;
+      margin-top: 15px;
+      transition: background 0.3s ease;
+    }
+
+    input {
+      width: 100%;
+      margin-top: 15px;
+      padding: 10px;
+      border-radius: 8px;
+      border: none;
+      outline: none;
+    }
+
+    #todoList {
+      margin-top: 15px;
+      list-style: none;
+    }
+
+    #todoList li {
+      background: rgba(255,255,255,0.1);
+      padding: 10px;
+      margin-top: 8px;
+      border-radius: 8px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .delete-btn {
+      background: crimson;
+      padding: 6px 10px;
+      font-size: 0.8rem;
+    }
+
+    canvas {
+      background: white;
+      border-radius: 12px;
+      margin-top: 15px;
+      width: 100%;
+    }
+
+    footer {
+      text-align: center;
+      padding: 25px;
+      opacity: 0.7;
+    }
+  </style>
+</head>
+
+<body>
+
+  <header>
+    <h1>Interactive Demo Site</h1>
+    <p>Simple HTML/CSS/JavaScript project for GitHub Pages</p>
+  </header>
+
+  <div class="container">
+
+    <!-- Counter -->
+    <div class="card">
+      <h2>Click Counter</h2>
+      <p>Press the button to increase the count.</p>
+
+      <div id="counter">0</div>
+      <button onclick="increaseCounter()">Click Me</button>
+    </div>
+
+    <!-- Random Color -->
+    <div class="card">
+      <h2>Random Color Generator</h2>
+      <p>Generate random colors instantly.</p>
+
+      <button onclick="changeColor()">Generate Color</button>
+      <div class="color-box" id="colorBox"></div>
+    </div>
+
+    <!-- Todo List -->
+    <div class="card">
+      <h2>Mini Todo List</h2>
+      <p>Add and remove tasks.</p>
+
+      <input type="text" id="todoInput" placeholder="Enter a task...">
+      <button onclick="addTodo()">Add Task</button>
+
+      <ul id="todoList"></ul>
+    </div>
+
+    <!-- Drawing Canvas -->
+    <div class="card">
+      <h2>Drawing Pad</h2>
+      <p>Draw with your mouse.</p>
+
+      <canvas id="drawCanvas" width="300" height="200"></canvas>
+      <button onclick="clearCanvas()">Clear</button>
+    </div>
+
+  </div>
+
+  <footer>
+    Built with HTML, CSS, and JavaScript
+  </footer>
+
+  <script>
+    // Counter
+    let count = 0;
+
+    function increaseCounter() {
+      count++;
+      document.getElementById("counter").textContent = count;
+    }
+
+    // Random Color Generator
+    function changeColor() {
+      const randomColor =
+        "#" + Math.floor(Math.random() * 16777215).toString(16);
+
+      document.getElementById("colorBox").style.background = randomColor;
+    }
+
+    // Todo List
+    function addTodo() {
+      const input = document.getElementById("todoInput");
+      const text = input.value.trim();
+
+      if (text === "") return;
+
+      const li = document.createElement("li");
+      li.innerHTML = `
+        ${text}
+        <button class="delete-btn">X</button>
+      `;
+
+      li.querySelector("button").onclick = () => li.remove();
+
+      document.getElementById("todoList").appendChild(li);
+
+      input.value = "";
+    }
+
+    // Drawing Canvas
+    const canvas = document.getElementById("drawCanvas");
+    const ctx = canvas.getContext("2d");
+
+    let drawing = false;
+
+    canvas.addEventListener("mousedown", () => {
+      drawing = true;
+    });
+
+    canvas.addEventListener("mouseup", () => {
+      drawing = false;
+      ctx.beginPath();
+    });
+
+    canvas.addEventListener("mousemove", draw);
+
+    function draw(event) {
+      if (!drawing) return;
+
+      const rect = canvas.getBoundingClientRect();
+
+      ctx.lineWidth = 3;
+      ctx.lineCap = "round";
+      ctx.strokeStyle = "#0f172a";
+
+      ctx.lineTo(
+        event.clientX - rect.left,
+        event.clientY - rect.top
+      );
+
+      ctx.stroke();
+
+      ctx.beginPath();
+
+      ctx.moveTo(
+        event.clientX - rect.left,
+        event.clientY - rect.top
+      );
+    }
+
+    function clearCanvas() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+    }
+  </script>
+
+</body>
+</html>
